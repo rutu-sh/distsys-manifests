@@ -8,7 +8,7 @@
     .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px #0001; padding: 2em; }
     h2 { text-align: center; margin-top: 0; }
     #scoresTable { width: 100%; border-collapse: collapse; margin-top: 1em; }
-    #scoresTable th, #scoresTable td { padding: 8px; border-bottom: 1px solid #eee; text-align: right; }
+  #scoresTable th, #scoresTable td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; }
     #scoresTable th { text-align: left; color: #888; }
     #backBtn { margin-top: 2em; display: block; width: 100%; padding: 0.5em; background: #222; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
   </style>
@@ -33,7 +33,7 @@
     }
     const username = getQueryParam('name');
     document.getElementById('userTitle').textContent = 'Scores for ' + (username || 'Unknown');
-    fetch('/user-scores?name=' + encodeURIComponent(username)).then(r => r.json()).then(data => {
+    fetch('/score/' + encodeURIComponent(username)).then(r => r.json()).then(data => {
       const body = document.getElementById('scoresBody');
       if (!data.scores || !data.scores.length) {
         body.innerHTML = '<tr><td>No scores found.</td></tr>';

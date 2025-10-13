@@ -2570,7 +2570,7 @@ function renderLeaderboard() {
       return;
     }
     body.innerHTML = scores.slice(0, 10).map(s =>
-      `<tr><td style="padding:4px 8px;border-bottom:1px solid #222;"><a href="/user-scores.html?name=${encodeURIComponent(s.name)}" style="color:#222;text-decoration:underline;cursor:pointer;">${s.name}</a></td><td style="padding:4px 8px;text-align:right;border-bottom:1px solid #222;">${s.score}</td></tr>`
+      `<tr><td style="padding:4px 8px;border-bottom:1px solid #222;"><a href="/user?name=${encodeURIComponent(s.name)}" style="color:#222;text-decoration:underline;cursor:pointer;">${s.name}</a></td><td style="padding:4px 8px;text-align:right;border-bottom:1px solid #222;">${s.score}</td></tr>`
     ).join('');
   }).catch(() => {
     document.getElementById('leaderboardBody').innerHTML = '<tr><td colspan="2" style="text-align:center;color:#aaa;">Error loading leaderboard</td></tr>';
@@ -2672,17 +2672,19 @@ function refreshLeaderboardAfterSave() {
     }
     document.getElementById('saveScoreForm').onsubmit = function(e) {
       e.preventDefault();
-      fetch('/save-score', {
+      const name = document.getElementById('playerName').value;
+      const score = document.getElementById('playerScore').value;
+      fetch('/score/' + encodeURIComponent(name), {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          name: document.getElementById('playerName').value,
-          score: document.getElementById('playerScore').value
-        })
-      }).then(r => r.json()).then(data => {
+        body: JSON.stringify({ score: score })
+      })
+      .then(r => r.json())
+      .then(data => {
         closeScoreModal();
         refreshLeaderboardAfterSave();
-      }).catch(() => {
+      })
+      .catch(() => {
         alert('Error saving score.');
       });
     };

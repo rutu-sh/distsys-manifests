@@ -17,33 +17,31 @@ def health_check():
     return jsonify({"status": "ok"})
 
 
-# Serve the main game HTML
+# Serve the dino game
 @app.get("/")
-def get_index_html():
-    logging.info("serving index.html")
-    return send_from_directory("game", "index.html")
+def get_dino_game_html():
+    logging.info("serving dino.html")
+    return send_from_directory("game", "dino.html")
 
 
-# Serve user scores HTML page
-@app.get("/user-scores.html")
+# Display user scores
+@app.get("/user")
 def user_scores_html():
-    logging.info("serving user_scores.html")
-    return send_from_directory("game", "user_scores.html")
+    logging.info("serving user.html")
+    return send_from_directory("game", "user.html")
 
 
-# Save the score
-@app.post("/save-score")
-def save_score():
-    logging.info("save score called")
+ # Save the score for a user
+@app.post("/score/<name>")
+def save_score(name):
+    logging.info(f"save score called for user {name}")
 
     # read the request
     data = request.get_json()
-    name = data.get("name")
     score = int(data.get("score"))
 
-    # Here you would save the score to a file or database
+    # Save the score to a file or database
     logging.info(f"Score submitted: {name} - {score}")
-     
     if os.path.exists(SCORES_FILE_PATH):
         scores_file = open(SCORES_FILE_PATH, "r")
         scores = json.load(scores_file)
@@ -56,60 +54,49 @@ def save_score():
         if name not in scores:
             scores[name] = []
         scores[name].append(score)
-        scores[name] = sorted(scores[name], reverse=True)[:5] # save top 5 scores of this user
+        
+        # save only top 5
+        scores[name] = sorted(scores[name], reverse=True)[:5]
 
     # write the scores to the file 
     with open(SCORES_FILE_PATH, "w") as f:
         json.dump(scores, f)
-    
+
     logging.info(f"score saved for user {name}")
- 
     return jsonify({"status": "success"})
 
 
-# API endpoint to get scores for a user
-@app.get("/user-scores")
-def user_scores():
-    name = request.args.get("name")
-
+ # Get scores of a user
+@app.get("/score/<name>")
+def user_scores(name):
     logging.info(f"fetching all scores for user {name}")
-
     if os.path.exists(SCORES_FILE_PATH):
         scores_file = open(SCORES_FILE_PATH, "r")
         scores = json.load(scores_file)
         scores_file.close()
     else:
         scores = {}
-
     user_scores = scores.get(name, []) if name else []
-
     logging.info(f"fetched all scores for user {name}!")
-
     return jsonify({"name": name, "scores": user_scores})
 
 
-# Endpoint to fetch all scores as JSON
+ # Endpoint to fetch scores as JSON
 @app.get("/scores")
 def get_scores():
-
-    logging.info("fetching all scores")
-
+    logging.info("fetching scores")
     if os.path.exists(SCORES_FILE_PATH):
         scores_file = open(SCORES_FILE_PATH, "r")
         scores = json.load(scores_file)
         scores_file.close()
     else:
         scores = {}
-
     # Flatten to [{name, score}] for frontend compatibility
     leaderboard = []
     for name, score_list in scores.items():
         for score in score_list:
             leaderboard.append({"name": name, "score": score})
-
     # Sort by score descending
     leaderboard.sort(key=lambda x: x["score"], reverse=True)
-
-    logging.info("fetched all scores!")
-
+    logging.info("fetched scores!")
     return jsonify(leaderboard)
