@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Scores</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; background: #fafafa; color: #222; margin: 0; }
+    .container { max-width: 400px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px #0001; padding: 2em; }
+    h2 { text-align: center; margin-top: 0; }
+    #scoresTable { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    #scoresTable th, #scoresTable td { padding: 8px; border-bottom: 1px solid #eee; text-align: right; }
+    #scoresTable th { text-align: left; color: #888; }
+    #backBtn { margin-top: 2em; display: block; width: 100%; padding: 0.5em; background: #222; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="userTitle">Scores for </h2>
+    <table id="scoresTable">
+      <thead>
+        <tr><th>Score</th></tr>
+      </thead>
+      <tbody id="scoresBody">
+        <tr><td>Loading...</td></tr>
+      </tbody>
+    </table>
+    <button id="backBtn" onclick="window.location.href='/'">Back to Game</button>
+  </div>
+  <script>
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+    const username = getQueryParam('name');
+    document.getElementById('userTitle').textContent = 'Scores for ' + (username || 'Unknown');
+    fetch('/user-scores?name=' + encodeURIComponent(username)).then(r => r.json()).then(data => {
+      const body = document.getElementById('scoresBody');
+      if (!data.scores || !data.scores.length) {
+        body.innerHTML = '<tr><td>No scores found.</td></tr>';
+        return;
+      }
+      body.innerHTML = data.scores.map(score => `<tr><td>${score}</td></tr>`).join('');
+    }).catch(() => {
+      document.getElementById('scoresBody').innerHTML = '<tr><td>Error loading scores.</td></tr>';
+    });
+  </script>
+</body>
+</html>
