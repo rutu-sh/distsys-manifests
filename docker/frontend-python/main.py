@@ -113,8 +113,3 @@ def get_scores():
     logging.info("fetched all scores!")
 
     return jsonify(leaderboard)
-
-
-if __name__ == "__main__":
-    logging.info("starting app...")
-    app.run(debug=False, port=8080)
