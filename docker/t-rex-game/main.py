@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 app = Flask("dino-game")
 
-SCORES_FILE_PATH = os.getenv("SCORES_FILE_PATT", "scores.json")
+SCORES_FILE_PATH = os.getenv("SCORES_FILE_PATH", "scores.json")
 
 # Health check to verify the state of the server
 @app.get("/health-check")
