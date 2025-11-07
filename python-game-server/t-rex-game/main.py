@@ -21,7 +21,7 @@ def health_check():
 @app.get("/")
 def get_dino_game_html():
     logging.info("serving dino.html")
-    return send_from_directory("game", "dino.html")
+    return send_from_directory("game", "trex.html")
 
 
 # Display user scores
